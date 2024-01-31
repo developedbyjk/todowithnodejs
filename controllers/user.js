@@ -1,63 +1,106 @@
 import {User} from '../models/user.js'
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import { sendCookie } from '../utils/features.js';
+import ErrorHandler from '../middlewares/error.js';
 
 
 export const  getAllUsers = async (req,res)=>{
-    const users = await User.find({})
-    
-    console.log(req.query)
-    
-    
-    //if key value par are same the we can write jsut key 
-    
-        res.json({
+    res.json({
         success:true,
-         users,
+        message:"worked succcessfully ",
     })
+
+    // res.send("this is working");
+}
+
+export const login = async(req,res,next)=>{
+    try{
+        const {email,password} = req.body;
+
+        const user = await User.findOne({email}).select("+password");
     
+        if(!user) return next(new ErrorHandler('Invalid Email or Password', 400))
+        
+        const isMatch = await bcrypt.compare(password,user.password);
+    
+        if(!isMatch) return next(new ErrorHandler('Invalid Email or Password', 400))
+    
+        sendCookie(user,res,`welcome back ${user.name}`,200)
+    }catch(error){
+        next(error);
     }
+}
 
 
 export const register = async(req,res)=>{
+  try{
+    const {name,email,password} = req.body;
 
-    const {name, email, password} = req.body;
 
-    await User.create({
-       name,
-       email,
-       password
-    })
-
-    // res.json({
-    //     success:true,
-    //     message: "successfully created a new user"
-    // })
-
-    res.status(201).cookie('temp','lol').json({
-    success:true,
-    message:'success'
-    })
-
-}
-
-export const getUserDetails = async (req,res)=>{
-
-    const {id} = req.query;
-    console.log(req.params)
-
-    // const user = await User.findById(id)
-
-    res.json({
-        success:true,
-        message: "successfully created a new user",
-        user : {}
-
-    })
+    //finding the user
+    let  user = await User.findOne({email});
+    if( user) return next(new ErrorHandler('User already exists', 400))
+    
  
+     //hashing the password
+     const hashedPassword = await bcrypt.hash(password,10);
+     
+     //creating the user
+     user = await User.create({
+         name,
+         email,
+         password: hashedPassword, // Use the hashed password
+       });
+ 
+     
+      sendCookie(user,res,'registerd successfully',201)
+  }catch(error){
+    next(error);
+  }
 
+}
+
+export const getMyProfile =  (req,res)=>{
+ 
+    const id = "myid";
+    res.status(200).json({
+        success:true,
+        user: req.user,
+    })
+
+        // res.status(200).json({
+        // success:true,
+        // })
 
 }
 
 
-//we will create function to update user
-//we will create function to delete user
-//we will create function to get user details
+export const logout = (req,res)=>{
+    res.status(200).cookie("token"," ",{
+        expire : new Date(Date.now()),
+        sameSite :  process.env.NODE_ENV === 'Development' ? 'lax' : 'none',
+        secure : process.env.NODE_ENV === 'Development' ? false : true,
+    }).json({
+        success:true,
+        message:"logged out successfully",
+    })
+}
+    
+        // if(!isMatch){
+        //     return res.status(404).json({
+        //         success:false,
+        //         message:"invaild email or password",
+        //     })
+        // }
+    
+        
+    
+
+   //checking if user already exists
+//    if(user){
+//     res.status(400).json({
+//         success:false,
+//         message:"User already exists",
+//     })
+//    }
