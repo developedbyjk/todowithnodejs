@@ -15,6 +15,10 @@ router.get('/logout', logout)
 
 router.get("/me",isAuthenticated, getMyProfile);
 
+
+
+
+
     // router.get('/userid/:id',getUserDetails)
 //  router("userid/:id").get(getUserDetails).put(updateUser).delete(deleteUser);
 
