@@ -24,10 +24,9 @@ app.use(cookieParser());
 app.use("/api/v1/users",userRouter);
 app.use("/api/v1/task",taskRouter);
 app.use(cors({
-   origin : [process.env.FRONTEND_URL],
-   methods : ["GET","POST","PUT","DELETE"],
-   //for allwong cookies and headers
-   credentials:true,
+   origin: [process.env.FRONTEND_URL],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
 }));
 
 
