@@ -24,10 +24,24 @@ app.use(cookieParser());
 app.use("/api/v1/users",userRouter);
 app.use("/api/v1/task",taskRouter);
 app.use(cors({
-   origin: [process.env.FRONTEND_URL],
+   // origin: [process.env.FRONTEND_URL],
+   origin:' https://todo-react-side.vercel.app',
+   
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
 }));
+
+
+
+// const corsOptions ={
+//     origin:'http://localhost:3000', 
+//     credentials:true,            //access-control-allow-credentials:true
+//     optionSuccessStatus:200
+// }
+// app.use(cors(corsOptions));
+
+
+
 
 
 app.get("/", (req, res) => {
