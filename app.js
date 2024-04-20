@@ -38,6 +38,8 @@ app.use((req, res) => {
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/task", taskRouter);
 
+//this was adden in april
+
 app.get("/", (req, res) => {
   res.send("Hello world");
 });
